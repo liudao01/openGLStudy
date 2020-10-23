@@ -108,7 +108,9 @@ public class MyRender implements GLSurfaceView.Renderer {
         String fragmentSource = XYShaderUtil.readRawText(context, R.raw.fragment_shader);
         program = XYShaderUtil.createProgram(vertexSource, fragmentSource);
         if (program > 0) {
+            // 获取顶点着色器的位置的句柄
             avPosition = GLES20.glGetAttribLocation(program, "av_Position");
+            // 获取片段着色器的颜色的句柄
             afColor = GLES20.glGetUniformLocation(program, "af_Color");
         }
 
@@ -135,9 +137,17 @@ public class MyRender implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl10) {
 
-        //清空屏幕，擦除屏幕上所有的颜色,清屏缓冲区
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        //用glClearColor定义的颜色填充
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+//        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        // 将程序添加到OpenGL ES环境
+        GLES20.glUseProgram(program);
+        // 设置绘制三角形的颜色
+        GLES20.glUniform4f(afColor, 1f, 0f, 0f, 1f);
+        // 启用三角形顶点位置的句柄
+        GLES20.glEnableVertexAttribArray(avPosition);
+        //准备三角形坐标数据
+        GLES20.glVertexAttribPointer(avPosition, 2, GLES20.GL_FLOAT, false, 8, vertexBuffer);
+        // 绘制三角形
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
 }
