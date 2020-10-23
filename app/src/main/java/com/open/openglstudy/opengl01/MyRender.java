@@ -17,7 +17,7 @@ public class MyRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-
+        //在这里也可以设置调用glClearColor设置清空屏幕用的颜色
     }
 
     @Override
@@ -41,6 +41,6 @@ public class MyRender implements GLSurfaceView.Renderer {
         //清空屏幕，擦除屏幕上所有的颜色,清屏缓冲区
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         //用glClearColor定义的颜色填充
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     }
 }

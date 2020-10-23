@@ -21,9 +21,8 @@ public class OpenGL02Activity extends AppCompatActivity {
 
     }
 
+
 //    注意GLSurfaceView的生成周期
-
-
     @Override
     protected void onPause() {
         super.onPause();
