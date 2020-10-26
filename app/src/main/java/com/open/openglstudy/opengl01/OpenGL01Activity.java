@@ -16,7 +16,7 @@ public class OpenGL01Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_opengl_triangle);
+        setContentView(R.layout.activity_opengl_one);
         xysurfaceview = findViewById(R.id.xysurfaceview);
 
     }
@@ -34,5 +34,10 @@ public class OpenGL01Activity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         xysurfaceview.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
