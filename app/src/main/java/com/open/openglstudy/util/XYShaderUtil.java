@@ -39,14 +39,20 @@ public class XYShaderUtil {
      */
     public static int loadShader(int shaderType, String source) {
 
+        //创建一个容纳shader的容器，称为shader容器。
         int shader = GLES20.glCreateShader(shaderType);
         if (shader != 0) {
+            //添加shader的源代码
             GLES20.glShaderSource(shader, source);
+            //对shader容器中的源代码进行编译。
             GLES20.glCompileShader(shader);
             int[] compile = new int[1];
+            //glGetShaderiv()函数可以用来检测着色器编译是否成功
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
             if (compile[0] != GLES20.GL_TRUE) {
+                //编译不成功返回0
                 LogUtil.e("shader compile error");
+                //删除Shader
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }
