@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".opengl01.OpenGL01Activity"></activity>
         <activity android:name=".opengl02.OpenGL02Activity"></activity>
+        <activity android:name=".opengl03.OpenGL03Activity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

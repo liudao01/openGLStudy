@@ -14,6 +14,7 @@ import com.open.openglstudy.adapter.HomeAdapter;
 import com.open.openglstudy.bean.ActivityBean;
 import com.open.openglstudy.opengl01.OpenGL01Activity;
 import com.open.openglstudy.opengl02.OpenGL02Activity;
+import com.open.openglstudy.opengl03.OpenGL03Activity;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         list.add(new ActivityBean(0, "opengl环境搭建,绘制一种颜色", OpenGL01Activity.class));
         list.add(new ActivityBean(0, "opengl绘制三角形(上半部分)", OpenGL02Activity.class));
+        list.add(new ActivityBean(0, "opengl绘制四边形", OpenGL03Activity.class));
 
 
         homeAdapter = new HomeAdapter(R.layout.home_item_view, list);
