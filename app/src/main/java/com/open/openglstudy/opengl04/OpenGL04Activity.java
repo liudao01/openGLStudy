@@ -16,7 +16,7 @@ public class OpenGL04Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_opengl_quadrilateral);
+        setContentView(R.layout.activity_opengl_image);
         xysurfaceview = findViewById(R.id.xysurfaceview);
 
     }

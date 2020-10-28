@@ -1,8 +1,11 @@
 package com.open.openglstudy.opengl04;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 
 import com.open.openglstudy.R;
 import com.open.openglstudy.util.XYShaderUtil;
@@ -24,18 +27,36 @@ import javax.microedition.khronos.opengles.GL10;
 public class MyRender implements GLSurfaceView.Renderer {
 
     private Context context;
-
-    private final  float[] vertexData={
-            -1f,0f,
-            0f,-1f,
-            0f,1f,
-            1f,0f
+    //顶点坐标
+    private final float[] vertexData = {
+            -1f, -1f,
+            1f, -1f,
+            -1f, 1f,
+            1f, 1f
     };
 
+    //纹理坐标  正常
+    private final float[] textureData = {
+            0f, 1f,
+            1f, 1f,
+            0f, 0f,
+            1f, 0f
+    };
+    //纹理坐标 倒立
+//    private final float[] textureData={
+//            1f,0f,
+//            0f,0f,
+//            1f, 1f,
+//            0f, 1f
+//    };
+
+
     private FloatBuffer vertexBuffer;//顶点缓冲 顶点buffer
+    private FloatBuffer textureBuffer;//纹理缓存 纹理buffer
     private int program;
-    private int avPosition;
-    private int afColor;
+    private int avPosition;//顶点坐标
+    private int afPosition;//纹理坐标
+    private int textureId;//纹理id保存
 
 
     public MyRender(Context context) {
@@ -52,12 +73,14 @@ public class MyRender implements GLSurfaceView.Renderer {
          * 而OpenGl的数据为小端字节序（LittleEdian）,因为数据存储结构的差异，所以，
          * 在Android中使用OpenGl的时候必须要进行下转换。当然，
          * 一般我们在使用的时候都会做个简单的工具类。这里提供几个简单的封装。（占几个字节就初始化ByteBuffer长度的时候*几）
+         *
+         * allocateDirect 分配内存空间
          */
-        vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer()
-                .put(vertexData);
-        vertexBuffer.position(0);
+
+        vertexBuffer = floatBufferUtil(vertexData);
+
+        textureBuffer = floatBufferUtil(textureData);
+
 
     }
 
@@ -74,20 +97,48 @@ public class MyRender implements GLSurfaceView.Renderer {
     }
 
 
-
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
         //找到顶点着色器,纹理着色器数据
         //加载顶点着色器和片段着色器用来修改图形的颜色，纹理，坐标等属性
-        String vertexSource = XYShaderUtil.readRawText(context, R.raw.vertex_shader);
-        String fragmentSource = XYShaderUtil.readRawText(context, R.raw.fragment_shader);
+        String vertexSource = XYShaderUtil.readRawText(context, R.raw.image_vertex_shader);
+        String fragmentSource = XYShaderUtil.readRawText(context, R.raw.image_fragment_shader);
         program = XYShaderUtil.createProgram(vertexSource, fragmentSource);
         if (program > 0) {
-            // 获取顶点着色器的位置的句柄
+            // 获取顶点着色器的位置的句柄,查询由program指定的先前链接的程序对象，用于name指定的属性变量，并返回绑定到该属性变量的通用顶点属性的索引
             avPosition = GLES20.glGetAttribLocation(program, "av_Position");
             // 获取片段着色器的颜色的句柄
-            afColor = GLES20.glGetUniformLocation(program, "af_Color");
+            afPosition = GLES20.glGetAttribLocation(program, "af_Position");
+
+            //创建纹理
+            int[] textureIds = new int[1];
+            GLES20.glGenTextures(1, textureIds, 0);
+            if (textureIds[0] == 0) {
+                return;
+            }
+
+            textureId = textureIds[0];
+
+            //绑定
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
+
+            //设置参数 环绕（超出纹理坐标范围）：
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+
+            //过滤（纹理像素映射到坐标点
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.woailuo);
+            if (bitmap == null) {
+                return;
+            }
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+            bitmap.recycle();
+            bitmap = null;
+
         }
 
     }
@@ -116,22 +167,23 @@ public class MyRender implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         //利用颜色清屏
-        GLES20.glClearColor(1.0f,1.0f,1.0f,1.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 
         //设置颜色 用了float 所以用4 f
-        GLES20.glUniform4f(afColor,0f,0f,1f,1f);
+//        GLES20.glUniform4f(afColor,0f,0f,1f,1f);
 
         //让program可用
         // 将程序添加到OpenGL ES环境
         GLES20.glUseProgram(program);
-        // 设置绘制四边形的颜色
-//        GLES20.glUniform4f(afColor, 1f, 0f, 0f, 1f);
-        // 启用三角形顶点位置的句柄
-        GLES20.glEnableVertexAttribArray(avPosition);
-        //准备三角形坐标数据
-        GLES20.glVertexAttribPointer(avPosition, 2, GLES20.GL_FLOAT, false, 8, vertexBuffer);
-        // 绘制四边形
+
+        //顶点坐标
+        GLES20.glEnableVertexAttribArray(avPosition);//顶点位置的句柄
+        GLES20.glVertexAttribPointer(avPosition, 2, GLES20.GL_FLOAT, false, 8, vertexBuffer);//准备图片顶点坐标数据
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);//绘制
+        //纹理坐标
+        GLES20.glEnableVertexAttribArray(afPosition);
+        GLES20.glVertexAttribPointer(afPosition, 2, GLES20.GL_FLOAT, false, 8, textureBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 }

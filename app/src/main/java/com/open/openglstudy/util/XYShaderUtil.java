@@ -39,10 +39,10 @@ public class XYShaderUtil {
      */
     public static int loadShader(int shaderType, String source) {
 
-        //创建一个容纳shader的容器，称为shader容器。
+        //创建一个容纳shader(2D图形,著色器)的容器，称为shader容器。,函数将返回一个整形的正整数作为shader容器的id。
         int shader = GLES20.glCreateShader(shaderType);
         if (shader != 0) {
-            //添加shader的源代码
+            //添加shader的源代码,加载shader的源代码
             GLES20.glShaderSource(shader, source);
             //对shader容器中的源代码进行编译。
             GLES20.glCompileShader(shader);
@@ -52,7 +52,7 @@ public class XYShaderUtil {
             if (compile[0] != GLES20.GL_TRUE) {
                 //编译不成功返回0
                 LogUtil.e("shader compile error");
-                //删除Shader
+                //删除Shader,当不再需要某个shader或某个程序的时候，需要对其进行清理，以释放资源。
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }
@@ -71,12 +71,12 @@ public class XYShaderUtil {
         if (fragmentShader == 0) {
             return 0;
         }
-        //创建一个渲染程序
+        //创建一个渲染程序,如果函数调用成功将返回一个正整数作为该着色器程序的id。
         int program = GLES20.glCreateProgram();
         if (program != 0) {
             //将着色器程序添加到渲染程序中
-            GLES20.glAttachShader(program,vertexShader);
-            GLES20.glAttachShader(program,fragmentShader);
+            GLES20.glAttachShader(program,vertexShader);//向程序中加入顶点着色器
+            GLES20.glAttachShader(program,fragmentShader);//向程序中加入片元着色器
             //链接源程序
             GLES20.glLinkProgram(program);
             int[] lineSatus = new int[1];

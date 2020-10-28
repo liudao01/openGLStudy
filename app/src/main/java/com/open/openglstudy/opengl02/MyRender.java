@@ -108,7 +108,7 @@ public class MyRender implements GLSurfaceView.Renderer {
         String fragmentSource = XYShaderUtil.readRawText(context, R.raw.fragment_shader);
         program = XYShaderUtil.createProgram(vertexSource, fragmentSource);
         if (program > 0) {
-            // 获取顶点着色器的位置的句柄
+            // 获取顶点着色器的位置的句柄,查询由program指定的先前链接的程序对象，用于name指定的属性变量，并返回绑定到该属性变量的通用顶点属性的索引
             avPosition = GLES20.glGetAttribLocation(program, "av_Position");
             // 获取片段着色器的颜色的句柄
             afColor = GLES20.glGetUniformLocation(program, "af_Color");
